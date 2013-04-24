@@ -59,16 +59,14 @@
 			layers: 'GCC_cc:Stormwaterpits',
 			format: 'image/png',
 			transparent: true,
-            maxZoom: 20,
-            attribution: gccAtt
+            maxZoom: 20
 		});
         
         var pipes = new L.TileLayer.WMS("http://maps.gcc.tas.gov.au:8080/geoserver/ows", {
 			layers: 'GCC_cc:Stormwaterpipes',
 			format: 'image/png',
 			transparent: true,
-            maxZoom: 20,
-            attribution: gccAtt
+            maxZoom: 20
 		});
         
         map.addLayer(pipes);

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Example</title>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+  <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+  <style>
+    body { margin:0; padding:0; }
+    #map {
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      height: 800px;
+    }
+  </style>
+</head>
+<body>
+
+<style type='text/css'>
+  #swipe {
+    background:#fff;
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:1000;
+    padding:10px;
+    height:30px;
+  }
+  #swipe #handle {
+    position:absolute;
+    height:20px;
+    padding:5px;
+    background:#aaa;
+    font-weight:bold;
+    border:1px solid #333;
+    cursor:pointer;
+    -webkit-user-select: none;
+  }
+</style>
+<div id='swipe'>
+    <div id='handle'>drag</div>
+</div>
+<div id='map'></div>
+<script>
+        var center = new L.LatLng(-42.8232,147.2555);
+        var map = new L.Map('map', { center: center, zoom: 18, attributionControl:true, zoomControl:false});
+
+        var gccAtt = '&copy Glenorchy City Council'
+        var pits = new L.TileLayer.WMS("http://maps.gcc.tas.gov.au:8080/geoserver/ows", {
+            layers: 'GCC_cc:Stormwaterpits',
+            format: 'image/png',
+            transparent: true,
+            maxZoom: 20,
+            attribution: gccAtt
+        }).addTo(map);
+
+        var pipes = new L.TileLayer.WMS("http://maps.gcc.tas.gov.au:8080/geoserver/ows", {
+            layers: 'GCC_cc:Stormwaterpipes',
+            format: 'image/png',
+            transparent: true,
+            maxZoom: 20,
+            attribution: gccAtt
+        }).addTo(map);
+
+  var l_parent = getLayer(map._layers)._container,
+      handle = document.getElementById('handle'),
+      dragging = false;
+  handle.onmousedown = function() { dragging = true; return false;}
+  document.onmouseup = function() { dragging = false; }
+  document.onmousemove = function(e) {
+      if (!dragging) return;
+      setDivide(e.x);
+  }
+  map.on( "zoomend", function( e ) {
+    // runs this code after you finishing the zoom
+   l_parent = getLayer(map._layers)._container;
+   setDivide(parseInt(handle.style.left));
+  });
+  map.on( "moveend", function( e ) {
+    // runs this code after you finishing the zoom
+   l_parent = getLayer(map._layers)._container;
+   setDivide(parseInt(handle.style.left));
+  });
+
+  function setDivide(x) {
+      x = Math.max(0, Math.min(x, map.getSize()['x']));
+      handle.style.left = (x) + 'px';
+      var layerX = map.containerPointToLayerPoint(x,0).x
+      l_parent.style.clip = 'rect(-99999px ' + layerX + 'px 999999px -99999px)';
+  }
+  
+  function getLayer(obj) {
+    var last;
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i) && typeof(i) !== 'function') {
+            last = obj[i];
+        }
+    }
+    return last;
+  }
+  setDivide(300);
+</script>
+
+</body>
+</html
