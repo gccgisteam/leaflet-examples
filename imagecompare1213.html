@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset=utf-8 />
-  <title>Example</title>
+  <title>Aerial Image Comparison 2012-2013</title>
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
   <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
   <style>
@@ -13,7 +13,7 @@
       left:0;
       right:0;
       bottom:0;
-      height: 800px;
+      height: (100% - 20);
     }
   </style>
 </head>
@@ -40,9 +40,10 @@
     cursor:pointer;
     -webkit-user-select: none;
   }
+
 </style>
 <div id='swipe'>
-    <div id='handle'>drag</div>
+    <div id='handle'>2013 | 2012</div>
 </div>
 <div id='map'></div>
 <script>
@@ -50,16 +51,16 @@
         var map = new L.Map('map', { center: center, zoom: 18, attributionControl:true, zoomControl:false});
 
         var gccAtt = '&copy Glenorchy City Council'
-        var pits = new L.TileLayer.WMS("http://maps.gcc.tas.gov.au:8080/geoserver/ows", {
-            layers: 'GCC_cc:Stormwaterpits',
+        var img2012 = new L.TileLayer.WMS("http://tobler-v:8080/geoserver/ows", {
+            layers: 'gcc:Glenorchy_Urban_1',
             format: 'image/png',
             transparent: true,
             maxZoom: 20,
             attribution: gccAtt
         }).addTo(map);
 
-        var pipes = new L.TileLayer.WMS("http://maps.gcc.tas.gov.au:8080/geoserver/ows", {
-            layers: 'GCC_cc:Stormwaterpipes',
+        var img2013 = new L.TileLayer.WMS("http://tobler-v:8080/geoserver/ows", {
+            layers: 'gcc:Image_2013_Urban',
             format: 'image/png',
             transparent: true,
             maxZoom: 20,
@@ -75,17 +76,18 @@
       if (!dragging) return;
       setDivide(e.x);
   }
+  var offset = 45;
   map.on( "zoomend", function( e ) {
    l_parent = getLayer(map._layers)._container;
-   setDivide(parseInt(handle.style.left));
+   setDivide(parseInt(handle.style.left)+offset);
   });
   map.on( "moveend", function( e ) {
    l_parent = getLayer(map._layers)._container;
-   setDivide(parseInt(handle.style.left));
+   setDivide(parseInt(handle.style.left)+offset);
   });
     map.on( "drag", function( e ) {
    l_parent = getLayer(map._layers)._container;
-   setDivide(parseInt(handle.style.left));
+   setDivide(parseInt(handle.style.left)+offset);
   });
     map.on( "mousemove", function( e ) {
    l_parent = getLayer(map._layers)._container;
@@ -93,12 +95,14 @@
   });
   
   function setDivide(x) {
-      x = Math.max(0, Math.min(x, map.getSize()['x']));
-      handle.style.left = (x) + 'px';
+      x = Math.max(offset, Math.min(x, (map.getSize()['x'] - offset)));
+      handle.style.left = (x-offset) + 'px';
       var layerX = map.containerPointToLayerPoint(x,0).x
       l_parent.style.clip = 'rect(-99999px ' + layerX + 'px 999999px -99999px)';
   }
-  
+  window.onresize = function(event) {
+    setDivide(map.getSize()['x'] / 2);
+    }
   function getLayer(obj) {
     var last;
     for (var i in obj) {
